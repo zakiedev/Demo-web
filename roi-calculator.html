@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROI Calculator – DegreeToCareer</title>
+  <meta name="description" content="Calculate the return on investment for your online degree. Compare course fees with expected salary hike.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .verdict-bar { height: 10px; border-radius: 999px; background: var(--line-soft); overflow: hidden; margin: 14px 0; }
+    .verdict-bar__fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--emerald)); border-radius: 999px; transition: width 0.5s ease; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header__inner">
+      <a href="index.html" class="header__logo">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        DegreeToCareer
+      </a>
+      <nav class="header__nav">
+        <a href="index.html">Home</a>
+        <a href="universities.html">Universities</a>
+        <a href="courses.html">Courses</a>
+        <a href="compare.html">Compare</a>
+        <a href="course-quiz.html">Quiz</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a href="booking.html" class="btn btn--gold header__cta">Book Free Call</a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
+  </header>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <nav class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu__close" id="closeMenu" aria-label="Close menu">&times;</button>
+    <a href="index.html">Home</a>
+    <a href="universities.html">Universities</a>
+    <a href="courses.html">Courses</a>
+    <a href="compare.html">Compare</a>
+    <a href="course-quiz.html">Quiz</a>
+    <a href="contact.html">Contact</a>
+    <a href="booking.html" class="btn btn--gold">Book Free Call</a>
+  </nav>
+
+  <main class="section container">
+    <div class="card-panel" style="max-width:600px;margin:0 auto;">
+      <span class="eyebrow">Decision tool</span>
+      <h1 style="font-size:1.7rem;margin:8px 0 6px;">ROI Calculator</h1>
+      <p style="color:var(--text-sec);margin-bottom:28px">Find out if your degree is worth the cost.</p>
+      <div class="form-group">
+        <label>Total Course Fees (₹)</label>
+        <input type="number" id="fees" placeholder="e.g., 150000">
+      </div>
+      <div class="form-group">
+        <label>Current Annual Salary (₹)</label>
+        <input type="number" id="currentSalary" placeholder="e.g., 300000">
+      </div>
+      <div class="form-group">
+        <label>Expected Annual Salary After Degree (₹)</label>
+        <input type="number" id="expectedSalary" placeholder="e.g., 600000">
+      </div>
+      <button class="btn btn--gold btn--block" onclick="calculateROI()">Calculate ROI</button>
+      <div id="roiResult"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__grid">
+      <div class="footer__col"><div class="footer__brand">DegreeToCareer</div><p style="font-size:0.85rem;color:#A6AAC7;max-width:220px;">India's trusted platform for finding UGC-approved online &amp; distance universities.</p></div>
+      <div class="footer__col"><h4>Explore</h4><a href="universities.html">Universities</a><a href="courses.html">Courses</a><a href="compare.html">Compare</a></div>
+      <div class="footer__col"><h4>Tools</h4><a href="roi-calculator.html">ROI Calculator</a><a href="emi-calculator.html">EMI Calculator</a><a href="fee-comparison.html">Fee Comparison</a></div>
+      <div class="footer__col"><h4>Support</h4><a href="contact.html">Contact</a><a href="booking.html">Book Counselling</a></div>
+    </div>
+    <div class="footer__bottom">&copy; 2026 DegreeToCareer.in</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    function calculateROI() {
+      const fees = parseFloat(document.getElementById('fees').value) || 0;
+      const current = parseFloat(document.getElementById('currentSalary').value) || 0;
+      const expected = parseFloat(document.getElementById('expectedSalary').value) || 0;
+
+      if (fees <= 0) { dtcToast('Enter your course fees to calculate ROI.', 'error'); return; }
+
+      const annualIncrease = expected - current;
+      const roi = fees > 0 ? ((annualIncrease / fees) * 100) : 0;
+      const paybackMonths = annualIncrease > 0 ? Math.ceil((fees / annualIncrease) * 12) : null;
+      const barWidth = Math.max(4, Math.min(100, roi));
+      const verdict = roi >= 100 ? 'Strong investment — pays for itself within a year.' : roi > 0 ? 'Reasonable investment — worth the cost over time.' : 'Salary increase doesn\u2019t currently cover the cost. Consider a different program or negotiate scholarships.';
+
+      document.getElementById('roiResult').innerHTML = `
+        <div class="result-box">
+          <p>📊 <strong>Annual Salary Increase:</strong> ₹${annualIncrease.toLocaleString('en-IN')}</p>
+          <p>📈 <strong>ROI:</strong> ${roi.toFixed(1)}% per year</p>
+          <p>⏳ <strong>Approximate Payback Period:</strong> ${paybackMonths ? paybackMonths + ' months' : 'N/A'}</p>
+          <div class="verdict-bar"><div class="verdict-bar__fill" style="width:${barWidth}%"></div></div>
+          <p style="color:var(--text-sec);font-size:0.85rem;">${verdict}</p>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard – DegreeToCareer</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="admin-body">
+    <aside class="admin-sidebar" id="sidebar">
+        <h2>🎓 Admin</h2>
+        <a href="#dashboard" class="active" onclick="navigate('dashboard')">Dashboard</a>
+        <a href="#universities" onclick="navigate('universities')">Universities</a>
+        <a href="#courses" onclick="navigate('courses')">Courses</a>
+        <a href="#blogs" onclick="navigate('blogs')">Blogs</a>
+        <a href="#leads" onclick="navigate('leads')">Leads</a>
+        <a href="index.html" target="_blank" style="opacity:0.7;">↗ View site</a>
+        <button class="admin-logout" onclick="logout()">Logout</button>
+    </aside>
+    <main class="admin-main" id="mainContent"></main>
+
+    <!-- Modal for forms -->
+    <div class="admin-modal" id="formModal">
+        <div class="admin-modal-content">
+            <button class="admin-close-btn" onclick="closeModal()">&times;</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/common.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://ujkfjalepcldduwbwddz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqa2ZqYWxlcGNsZGR1d2J3ZGR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2NTUxMjgsImV4cCI6MjEwMTIzMTEyOH0.8wjBN2fuQolkagyCP7Hf_40CEhq3T2VZYtX96YEv65Y';
+        const IMGBB_KEY = 'ec6e05b038a28485e4f1098f59f3874f';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Auth check
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) { window.location.href = 'admin-login.html'; return; }
+            navigate('dashboard');
+        }
+        window.addEventListener('load', checkAuth);
+
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = 'admin-login.html';
+        }
+
+        function navigate(view) {
+            document.querySelectorAll('.admin-sidebar a').forEach(a => a.classList.remove('active'));
+            document.querySelector(`.admin-sidebar a[href="#${view}"]`)?.classList.add('active');
+            switch (view) {
+                case 'dashboard': showDashboard(); break;
+                case 'universities': showUniversities(); break;
+                case 'courses': showCourses(); break;
+                case 'blogs': showBlogs(); break;
+                case 'leads': showLeads(); break;
+            }
+        }
+
+        async function showDashboard() {
+            document.getElementById('mainContent').innerHTML = `<div class="skeleton" style="height:100px"></div>`;
+            const { count: uniCount } = await supabase.from('universities').select('*', { count: 'exact', head: true });
+            const { count: courseCount } = await supabase.from('courses').select('*', { count: 'exact', head: true });
+            const { count: leadCount } = await supabase.from('leads').select('*', { count: 'exact', head: true });
+            document.getElementById('mainContent').innerHTML = `
+                <h1 style="font-size:1.6rem;margin-bottom:20px;">Dashboard</h1>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">
+                    <div class="admin-card admin-stat"><span style="color:var(--text-sec);font-size:0.85rem;">Universities</span><strong>${uniCount ?? 0}</strong></div>
+                    <div class="admin-card admin-stat"><span style="color:var(--text-sec);font-size:0.85rem;">Courses</span><strong>${courseCount ?? 0}</strong></div>
+                    <div class="admin-card admin-stat"><span style="color:var(--text-sec);font-size:0.85rem;">Leads</span><strong>${leadCount ?? 0}</strong></div>
+                </div>
+            `;
+        }
+
+        // ========== UNIVERSITIES CRUD ==========
+        async function showUniversities() {
+            document.getElementById('mainContent').innerHTML = `<div class="skeleton" style="height:200px"></div>`;
+            const { data, error } = await supabase.from('universities').select('*').order('name');
+            if (error) { document.getElementById('mainContent').innerHTML = `<div class="empty-state"><h3>Couldn't load universities</h3><p>${error.message}</p></div>`; return; }
+            let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><h1 style="font-size:1.6rem;">Manage Universities</h1><button class="btn btn--primary" onclick="openUniForm()">+ Add New</button></div>`;
+            if (!data.length) {
+                html += `<div class="empty-state"><div class="empty-icon">🏫</div><h3>No universities yet</h3><p>Add your first one to make it appear on the live site.</p></div>`;
+            } else {
+                html += `<div class="table-wrapper"><table class="admin-table"><thead><tr><th>Name</th><th>Slug</th><th>Accreditation</th><th>Actions</th></tr></thead><tbody>`;
+                data.forEach(u => {
+                    html += `<tr><td>${u.name}</td><td>${u.slug}</td><td>${u.accreditation || ''}</td><td><button class="btn btn--secondary" onclick="openUniForm('${u.id}')">Edit</button> <button class="btn" style="background:var(--rose-tint);color:var(--rose);" onclick="deleteUniversity('${u.id}')">Delete</button></td></tr>`;
+                });
+                html += '</tbody></table></div>';
+            }
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        async function openUniForm(id = null) {
+            let uni = { name: '', slug: '', accreditation: '', ranking: '', avg_fee: '', placement_rate: '', description: '', logo_url: '' };
+            if (id) {
+                const { data } = await supabase.from('universities').select('*').eq('id', id).single();
+                if (data) uni = data;
+            }
+            document.getElementById('modalBody').innerHTML = `
+                <h2 style="margin-bottom:16px;">${id ? 'Edit' : 'Add'} University</h2>
+                <div class="admin-form-row"><input type="text" id="uniName" placeholder="Name" value="${uni.name}"></div>
+                <div class="admin-form-row"><input type="text" id="uniSlug" placeholder="Slug (e.g. amity-online)" value="${uni.slug}"></div>
+                <div class="admin-form-row"><input type="text" id="uniAccreditation" placeholder="Accreditation" value="${uni.accreditation || ''}"></div>
+                <div class="admin-form-row"><input type="text" id="uniRanking" placeholder="Ranking (number)" value="${uni.ranking || ''}"></div>
+                <div class="admin-form-row"><input type="text" id="uniFee" placeholder="Avg Fee" value="${uni.avg_fee || ''}"></div>
+                <div class="admin-form-row"><input type="text" id="uniPlacement" placeholder="Placement %" value="${uni.placement_rate || ''}"></div>
+                <div class="admin-form-row"><textarea id="uniDesc" placeholder="Description" rows="3">${uni.description || ''}</textarea></div>
+                <div class="admin-form-row"><label style="align-self:center;font-size:0.85rem;font-weight:600;">Logo:</label><input type="file" id="uniLogoFile" accept="image/*"></div>
+                <div class="admin-form-row"><input type="text" id="uniLogoUrl" placeholder="Or existing logo URL" value="${uni.logo_url || ''}"></div>
+                <button class="btn btn--primary" onclick="saveUniversity('${id || ''}')">Save</button>
+            `;
+            document.getElementById('formModal').classList.add('open');
+        }
+
+        async function saveUniversity(id) {
+            const name = document.getElementById('uniName').value;
+            const slug = document.getElementById('uniSlug').value;
+            const accreditation = document.getElementById('uniAccreditation').value;
+            const ranking = document.getElementById('uniRanking').value;
+            const avg_fee = document.getElementById('uniFee').value;
+            const placement_rate = document.getElementById('uniPlacement').value;
+            const description = document.getElementById('uniDesc').value;
+            let logo_url = document.getElementById('uniLogoUrl').value;
+            const fileInput = document.getElementById('uniLogoFile');
+            if (fileInput.files.length > 0) {
+                const formData = new FormData();
+                formData.append('image', fileInput.files[0]);
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: formData });
+                const json = await res.json();
+                if (json.success) logo_url = json.data.url;
+            }
+            const obj = { name, slug, accreditation, ranking: parseInt(ranking) || null, avg_fee, placement_rate, description, logo_url };
+            let error;
+            if (id) ({ error } = await supabase.from('universities').update(obj).eq('id', id));
+            else ({ error } = await supabase.from('universities').insert([obj]));
+            if (error) dtcToast('Error: ' + error.message, 'error');
+            else { closeModal(); dtcToast('University saved.', 'success'); showUniversities(); }
+        }
+
+        async function deleteUniversity(id) {
+            if (!confirm('Delete this university?')) return;
+            const { error } = await supabase.from('universities').delete().eq('id', id);
+            if (error) dtcToast(error.message, 'error');
+            else { dtcToast('University deleted.', 'success'); showUniversities(); }
+        }
+
+        function closeModal() { document.getElementById('formModal').classList.remove('open'); }
+
+        // ========== COURSES CRUD ==========
+        async function showCourses() {
+            document.getElementById('mainContent').innerHTML = `<div class="skeleton" style="height:200px"></div>`;
+            const { data, error } = await supabase.from('courses').select('*').order('name');
+            if (error) { document.getElementById('mainContent').innerHTML = `<div class="empty-state"><h3>Couldn't load courses</h3><p>${error.message}</p></div>`; return; }
+            let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><h1 style="font-size:1.6rem;">Manage Courses</h1><button class="btn btn--primary" onclick="openCourseForm()">+ Add New</button></div>`;
+            if (!data.length) {
+                html += `<div class="empty-state"><div class="empty-icon">📚</div><h3>No courses yet</h3></div>`;
+            } else {
+                html += `<div class="table-wrapper"><table class="admin-table"><thead><tr><th>Name</th><th>Duration</th><th>Level</th><th>Actions</th></tr></thead><tbody>`;
+                data.forEach(c => {
+                    html += `<tr><td>${c.name}</td><td>${c.duration || ''}</td><td>${c.level || ''}</td><td><button class="btn btn--secondary" onclick="openCourseForm('${c.id}')">Edit</button> <button class="btn" style="background:var(--rose-tint);color:var(--rose);" onclick="deleteCourse('${c.id}')">Delete</button></td></tr>`;
+                });
+                html += '</tbody></table></div>';
+            }
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        async function openCourseForm(id = null) {
+            let course = { name: '', slug: '', duration: '', level: '', description: '' };
+            if (id) {
+                const { data } = await supabase.from('courses').select('*').eq('id', id).single();
+                if (data) course = data;
+            }
+            document.getElementById('modalBody').innerHTML = `
+                <h2 style="margin-bottom:16px;">${id ? 'Edit' : 'Add'} Course</h2>
+                <div class="admin-form-row"><input type="text" id="courseName" placeholder="Name" value="${course.name}"></div>
+                <div class="admin-form-row"><input type="text" id="courseSlug" placeholder="Slug" value="${course.slug}"></div>
+                <div class="admin-form-row"><input type="text" id="courseDuration" placeholder="Duration" value="${course.duration}"></div>
+                <div class="admin-form-row"><input type="text" id="courseLevel" placeholder="Level (e.g. Management)" value="${course.level}"></div>
+                <div class="admin-form-row"><textarea id="courseDesc" placeholder="Description" rows="3">${course.description}</textarea></div>
+                <button class="btn btn--primary" onclick="saveCourse('${id || ''}')">Save</button>
+            `;
+            document.getElementById('formModal').classList.add('open');
+        }
+
+        async function saveCourse(id) {
+            const obj = {
+                name: document.getElementById('courseName').value,
+                slug: document.getElementById('courseSlug').value,
+                duration: document.getElementById('courseDuration').value,
+                level: document.getElementById('courseLevel').value,
+                description: document.getElementById('courseDesc').value
+            };
+            let error;
+            if (id) ({ error } = await supabase.from('courses').update(obj).eq('id', id));
+            else ({ error } = await supabase.from('courses').insert([obj]));
+            if (error) dtcToast('Error: ' + error.message, 'error');
+            else { closeModal(); dtcToast('Course saved.', 'success'); showCourses(); }
+        }
+
+        async function deleteCourse(id) {
+            if (!confirm('Delete this course?')) return;
+            const { error } = await supabase.from('courses').delete().eq('id', id);
+            if (error) dtcToast(error.message, 'error');
+            else { dtcToast('Course deleted.', 'success'); showCourses(); }
+        }
+
+        // ========== BLOGS CRUD ==========
+        async function showBlogs() {
+            document.getElementById('mainContent').innerHTML = `<div class="skeleton" style="height:200px"></div>`;
+            const { data, error } = await supabase.from('blogs').select('*').order('published_at', { ascending: false });
+            if (error) { document.getElementById('mainContent').innerHTML = `<div class="empty-state"><h3>Couldn't load blogs</h3><p>${error.message}</p></div>`; return; }
+            let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><h1 style="font-size:1.6rem;">Manage Blogs</h1><button class="btn btn--primary" onclick="openBlogForm()">+ Add New</button></div>`;
+            if (!data.length) {
+                html += `<div class="empty-state"><div class="empty-icon">📝</div><h3>No blog posts yet</h3></div>`;
+            } else {
+                html += `<div class="table-wrapper"><table class="admin-table"><thead><tr><th>Title</th><th>Slug</th><th>Published</th><th>Actions</th></tr></thead><tbody>`;
+                data.forEach(b => {
+                    html += `<tr><td>${b.title}</td><td>${b.slug}</td><td>${b.published_at ? new Date(b.published_at).toLocaleDateString() : ''}</td><td><button class="btn btn--secondary" onclick="openBlogForm('${b.id}')">Edit</button> <button class="btn" style="background:var(--rose-tint);color:var(--rose);" onclick="deleteBlog('${b.id}')">Delete</button></td></tr>`;
+                });
+                html += '</tbody></table></div>';
+            }
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        async function openBlogForm(id = null) {
+            let blog = { title: '', slug: '', content: '', excerpt: '', published_at: new Date().toISOString().split('T')[0] };
+            if (id) {
+                const { data } = await supabase.from('blogs').select('*').eq('id', id).single();
+                if (data) blog = data;
+            }
+            document.getElementById('modalBody').innerHTML = `
+                <h2 style="margin-bottom:16px;">${id ? 'Edit' : 'Add'} Blog</h2>
+                <div class="admin-form-row"><input type="text" id="blogTitle" placeholder="Title" value="${blog.title}"></div>
+                <div class="admin-form-row"><input type="text" id="blogSlug" placeholder="Slug" value="${blog.slug}"></div>
+                <div class="admin-form-row"><textarea id="blogExcerpt" placeholder="Excerpt" rows="2">${blog.excerpt}</textarea></div>
+                <div class="admin-form-row"><textarea id="blogContent" placeholder="Content (HTML)" rows="6">${blog.content}</textarea></div>
+                <div class="admin-form-row"><input type="date" id="blogDate" value="${blog.published_at}"></div>
+                <button class="btn btn--primary" onclick="saveBlog('${id || ''}')">Save</button>
+            `;
+            document.getElementById('formModal').classList.add('open');
+        }
+
+        async function saveBlog(id) {
+            const obj = {
+                title: document.getElementById('blogTitle').value,
+                slug: document.getElementById('blogSlug').value,
+                excerpt: document.getElementById('blogExcerpt').value,
+                content: document.getElementById('blogContent').value,
+                published_at: document.getElementById('blogDate').value
+            };
+            let error;
+            if (id) ({ error } = await supabase.from('blogs').update(obj).eq('id', id));
+            else ({ error } = await supabase.from('blogs').insert([obj]));
+            if (error) dtcToast('Error: ' + error.message, 'error');
+            else { closeModal(); dtcToast('Blog saved.', 'success'); showBlogs(); }
+        }
+
+        async function deleteBlog(id) {
+            if (!confirm('Delete this blog?')) return;
+            const { error } = await supabase.from('blogs').delete().eq('id', id);
+            if (error) dtcToast(error.message, 'error');
+            else { dtcToast('Blog deleted.', 'success'); showBlogs(); }
+        }
+
+        // ========== LEADS ==========
+        async function showLeads() {
+            document.getElementById('mainContent').innerHTML = `<div class="skeleton" style="height:200px"></div>`;
+            const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
+            if (error) { document.getElementById('mainContent').innerHTML = `<div class="empty-state"><h3>Couldn't load leads</h3><p>${error.message}</p></div>`; return; }
+            let html = `<h1 style="font-size:1.6rem;margin-bottom:18px;">Student Leads</h1>`;
+            if (!data.length) {
+                html += `<div class="empty-state"><div class="empty-icon">📥</div><h3>No leads yet</h3><p>Enquiries from the Contact and Booking pages will appear here.</p></div>`;
+            } else {
+                html += `<div class="table-wrapper"><table class="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Course Interest</th><th>Status</th></tr></thead><tbody>`;
+                data.forEach(l => {
+                    html += `<tr><td>${l.name}</td><td>${l.email}</td><td>${l.phone}</td><td>${l.course_interest || ''}</td><td><span class="badge badge--accent">${l.status || 'new'}</span></td></tr>`;
+                });
+                html += '</tbody></table></div>';
+            }
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        // Close modal on outside click
+        document.getElementById('formModal').addEventListener('click', function (e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Counselling – DegreeToCareer</title>
+  <meta name="description" content="Schedule a free 1-on-1 counselling session with our education expert.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header__inner">
+      <a href="index.html" class="header__logo">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        DegreeToCareer
+      </a>
+      <nav class="header__nav">
+        <a href="index.html">Home</a>
+        <a href="universities.html">Universities</a>
+        <a href="courses.html">Courses</a>
+        <a href="compare.html">Compare</a>
+        <a href="course-quiz.html">Quiz</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a href="booking.html" class="btn btn--gold header__cta">Book Free Call</a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
+  </header>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <nav class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu__close" id="closeMenu" aria-label="Close menu">&times;</button>
+    <a href="index.html">Home</a>
+    <a href="universities.html">Universities</a>
+    <a href="courses.html">Courses</a>
+    <a href="compare.html">Compare</a>
+    <a href="course-quiz.html">Quiz</a>
+    <a href="contact.html">Contact</a>
+    <a href="booking.html" class="btn btn--gold">Book Free Call</a>
+  </nav>
+
+  <main class="section container">
+    <div class="card-panel" style="max-width:700px;margin:0 auto;">
+      <span class="eyebrow">Free · 30 minutes</span>
+      <h1 style="font-size:1.7rem;margin:8px 0 6px;">Book Free Counselling</h1>
+      <p style="color:var(--text-sec); margin-bottom:24px;">Choose a convenient time slot and our expert will call you.</p>
+      <form id="bookingForm">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" name="name" required placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" name="email" required placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label>Phone *</label>
+          <input type="tel" name="phone" required placeholder="10-digit number" pattern="[6-9]\d{9}">
+        </div>
+        <div class="form-group">
+          <label>Preferred Date</label>
+          <input type="date" name="date" required>
+        </div>
+        <div class="form-group">
+          <label>Preferred Time</label>
+          <select name="time" required>
+            <option value="">Select a slot</option>
+            <option>10:00 AM - 11:00 AM</option>
+            <option>11:00 AM - 12:00 PM</option>
+            <option>2:00 PM - 3:00 PM</option>
+            <option>4:00 PM - 5:00 PM</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn--gold btn--block" id="bookBtn">Confirm Booking</button>
+        <p id="bookingMsg" style="margin-top:16px;"></p>
+      </form>
+      <div style="margin-top:32px;">
+        <p style="text-align:center; margin-bottom:8px; color:var(--text-sec);">Or pick a slot directly on Calendly</p>
+        <div class="calendly-inline-widget" data-url="https://calendly.com/degreetocareer/30min" style="min-width:280px;height:630px;border-radius:20px;overflow:hidden;"></div>
+        <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__grid">
+      <div class="footer__col"><div class="footer__brand">DegreeToCareer</div><p style="font-size:0.85rem;color:#A6AAC7;max-width:220px;">India's trusted platform for finding UGC-approved online &amp; distance universities.</p></div>
+      <div class="footer__col"><h4>Explore</h4><a href="universities.html">Universities</a><a href="courses.html">Courses</a><a href="compare.html">Compare</a></div>
+      <div class="footer__col"><h4>Tools</h4><a href="roi-calculator.html">ROI Calculator</a><a href="emi-calculator.html">EMI Calculator</a><a href="fee-comparison.html">Fee Comparison</a><a href="course-quiz.html">Course Quiz</a></div>
+      <div class="footer__col"><h4>Support</h4><a href="contact.html">Contact</a><a href="booking.html">Book Counselling</a></div>
+    </div>
+    <div class="footer__bottom">&copy; 2026 DegreeToCareer.in</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    document.getElementById('bookingForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const btn = document.getElementById('bookBtn');
+      btn.disabled = true; btn.textContent = 'Booking…';
+
+      const result = await dtcSubmitLead({
+        name: form.name.value.trim(),
+        email: form.email.value.trim(),
+        phone: form.phone.value.trim(),
+        course_interest: `Counselling slot: ${form.date.value} · ${form.time.value}`
+      });
+
+      btn.disabled = false; btn.textContent = 'Confirm Booking';
+      const msg = document.getElementById('bookingMsg');
+      if (result.ok) {
+        msg.innerHTML = '<span style="color:var(--emerald)">✅ Booking confirmed! We will call you at the selected time.</span>';
+        dtcToast('Booking confirmed — see you then!', 'success');
+        form.reset();
+      } else {
+        msg.innerHTML = '<span style="color:var(--rose)">Could not confirm your booking. Please try again.</span>';
+        dtcToast('Booking failed — please try again.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

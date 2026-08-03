@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universities – DegreeToCareer</title>
+  <meta name="description" content="Browse 5,000+ UGC-approved universities. Filter by state, accreditation & more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header__inner">
+      <a href="index.html" class="header__logo">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        DegreeToCareer
+      </a>
+      <nav class="header__nav">
+        <a href="index.html">Home</a>
+        <a href="universities.html" class="active">Universities</a>
+        <a href="courses.html">Courses</a>
+        <a href="compare.html">Compare</a>
+        <a href="course-quiz.html">Quiz</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a href="booking.html" class="btn btn--gold header__cta">Book Free Call</a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
+  </header>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <nav class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu__close" id="closeMenu" aria-label="Close menu">&times;</button>
+    <a href="index.html">Home</a>
+    <a href="universities.html" class="active">Universities</a>
+    <a href="courses.html">Courses</a>
+    <a href="compare.html">Compare</a>
+    <a href="course-quiz.html">Quiz</a>
+    <a href="contact.html">Contact</a>
+    <a href="booking.html" class="btn btn--gold">Book Free Call</a>
+  </nav>
+
+  <main class="container section">
+    <div class="section-title" style="text-align:left;margin-bottom:28px;">
+      <span class="eyebrow">5,000+ verified programs</span>
+      <h1 style="font-size:clamp(1.7rem,4vw,2.4rem);margin-top:8px;">Find Universities</h1>
+    </div>
+    <div class="filters">
+      <select id="stateFilter"><option value="">All States</option></select>
+      <select id="accreditationFilter"><option value="">All Accreditations</option></select>
+      <input type="text" id="searchInput" placeholder="Search by name..." aria-label="Search">
+      <select id="sortBy"><option value="ranking">Sort: Ranking</option><option value="fees">Sort: Fees Low to High</option></select>
+      <button class="btn btn--primary" onclick="loadUniversities(1)">Apply</button>
+    </div>
+    <div class="uni-grid" id="uniGrid">
+      <div class="skeleton" style="height:190px"></div><div class="skeleton" style="height:190px"></div>
+      <div class="skeleton" style="height:190px"></div><div class="skeleton" style="height:190px"></div>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__grid">
+      <div class="footer__col"><div class="footer__brand">DegreeToCareer</div><p style="font-size:0.85rem;color:#A6AAC7;max-width:220px;">India's trusted platform for finding UGC-approved online &amp; distance universities.</p></div>
+      <div class="footer__col"><h4>Explore</h4><a href="universities.html">Universities</a><a href="courses.html">Courses</a><a href="compare.html">Compare</a></div>
+      <div class="footer__col"><h4>Tools</h4><a href="roi-calculator.html">ROI Calculator</a><a href="emi-calculator.html">EMI Calculator</a><a href="fee-comparison.html">Fee Comparison</a><a href="course-quiz.html">Course Quiz</a></div>
+      <div class="footer__col"><h4>Support</h4><a href="contact.html">Contact</a><a href="booking.html">Book Counselling</a></div>
+    </div>
+    <div class="footer__bottom">&copy; 2026 DegreeToCareer.in</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    let allUniversities = [];
+    let currentPage = 1;
+    const perPage = 6;
+
+    function populateFilters() {
+      const states = [...new Set(allUniversities.map(u => u.state).filter(Boolean))].sort();
+      const accreditations = [...new Set(allUniversities.map(u => u.accreditation).filter(Boolean))];
+      const stateSel = document.getElementById('stateFilter');
+      const accSel = document.getElementById('accreditationFilter');
+      states.forEach(s => { const opt = document.createElement('option'); opt.value = s; opt.textContent = s; stateSel.appendChild(opt); });
+      accreditations.forEach(a => { const opt = document.createElement('option'); opt.value = a; opt.textContent = a; accSel.appendChild(opt); });
+    }
+
+    function feeNumber(u) {
+      if (typeof u.fees === 'number') return u.fees;
+      if (typeof u.avg_fee === 'number') return u.avg_fee;
+      const parsed = parseFloat(String(u.avg_fee || u.fees || '0').replace(/[^0-9.]/g, ''));
+      return isNaN(parsed) ? 0 : parsed;
+    }
+
+    function loadUniversities(page) {
+      currentPage = page;
+      const state = document.getElementById('stateFilter').value;
+      const accreditation = document.getElementById('accreditationFilter').value;
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const sort = document.getElementById('sortBy').value;
+
+      let filtered = allUniversities.filter(u => {
+        if (state && u.state !== state) return false;
+        if (accreditation && u.accreditation !== accreditation) return false;
+        if (search && !u.name.toLowerCase().includes(search)) return false;
+        return true;
+      });
+
+      if (sort === 'fees') filtered.sort((a, b) => feeNumber(a) - feeNumber(b));
+      else filtered.sort((a, b) => (a.ranking || 999) - (b.ranking || 999));
+
+      const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+      const start = (page - 1) * perPage;
+      const paginated = filtered.slice(start, start + perPage);
+      const grid = document.getElementById('uniGrid');
+
+      if (paginated.length === 0) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon">🔍</div><h3>No universities match those filters</h3><p>Try clearing a filter or searching a different term.</p></div>`;
+      } else {
+        grid.innerHTML = paginated.map(u => `
+          <div class="uni-card">
+            <div class="uni-card__header">
+              <div class="uni-card__logo">${u.logo_url ? `<img src="${u.logo_url}" alt="">` : (u.name||'?').charAt(0)}</div>
+              <div>
+                <div class="uni-card__name">${u.name}</div>
+                <div class="uni-card__meta">${u.accreditation || ''}${u.state ? ' · ' + u.state : ''}</div>
+              </div>
+            </div>
+            <div class="uni-card__footer">
+              <span class="badge badge--verified">Verified</span>
+              <div style="display:flex;gap:8px">
+                <a href="uni-detail.html?slug=${u.slug}" class="btn btn--ghost">Details</a>
+                <button class="btn btn--ghost" onclick="addToCompare('${u.slug}')">+ Compare</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      let pagHTML = '';
+      for (let i = 1; i <= totalPages; i++) pagHTML += `<button class="${i === page ? 'active' : ''}" onclick="loadUniversities(${i})">${i}</button>`;
+      document.getElementById('pagination').innerHTML = totalPages > 1 ? pagHTML : '';
+    }
+
+    function addToCompare(slug) {
+      let list = JSON.parse(localStorage.getItem('dtc_compare') || '[]');
+      if (list.includes(slug)) { dtcToast('Already in your comparison list.', 'error'); return; }
+      if (list.length >= 4) { dtcToast('You can compare up to 4 universities at a time.', 'error'); return; }
+      list.push(slug);
+      localStorage.setItem('dtc_compare', JSON.stringify(list));
+      dtcToast(`Added to comparison (${list.length}/4). `, 'success');
+    }
+
+    (async function init() {
+      const { data } = await dtcFetchUniversities();
+      allUniversities = data;
+      populateFilters();
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('search')) document.getElementById('searchInput').value = urlParams.get('search');
+      loadUniversities(1);
+    })();
+  </script>
+</body>
+</html>

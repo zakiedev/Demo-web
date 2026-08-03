@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>University Details – DegreeToCareer</title>
+  <meta name="description" content="View complete details of the university including courses, fees, placements, and accreditation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>.container { max-width: 880px; }</style>
+</head>
+<body>
+  <header class="header">
+    <div class="header__inner">
+      <a href="index.html" class="header__logo">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        DegreeToCareer
+      </a>
+      <nav class="header__nav">
+        <a href="index.html">Home</a>
+        <a href="universities.html" class="active">Universities</a>
+        <a href="courses.html">Courses</a>
+        <a href="compare.html">Compare</a>
+        <a href="course-quiz.html">Quiz</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a href="booking.html" class="btn btn--gold header__cta">Book Free Call</a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
+  </header>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <nav class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu__close" id="closeMenu" aria-label="Close menu">&times;</button>
+    <a href="index.html">Home</a>
+    <a href="universities.html" class="active">Universities</a>
+    <a href="courses.html">Courses</a>
+    <a href="compare.html">Compare</a>
+    <a href="course-quiz.html">Quiz</a>
+    <a href="contact.html">Contact</a>
+    <a href="booking.html" class="btn btn--gold">Book Free Call</a>
+  </nav>
+
+  <main class="container section" id="detailContent">
+    <div class="skeleton" style="height:40px;width:60%;margin-bottom:16px;"></div>
+    <div class="skeleton" style="height:140px;margin-bottom:16px;"></div>
+    <div class="skeleton" style="height:100px;"></div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__grid">
+      <div class="footer__col"><div class="footer__brand">DegreeToCareer</div><p style="font-size:0.85rem;color:#A6AAC7;max-width:220px;">India's trusted platform for finding UGC-approved online &amp; distance universities.</p></div>
+      <div class="footer__col"><h4>Explore</h4><a href="universities.html">Universities</a><a href="courses.html">Courses</a><a href="compare.html">Compare</a></div>
+      <div class="footer__col"><h4>Tools</h4><a href="roi-calculator.html">ROI Calculator</a><a href="emi-calculator.html">EMI Calculator</a><a href="fee-comparison.html">Fee Comparison</a><a href="course-quiz.html">Course Quiz</a></div>
+      <div class="footer__col"><h4>Support</h4><a href="contact.html">Contact</a><a href="booking.html">Book Counselling</a></div>
+    </div>
+    <div class="footer__bottom">&copy; 2026 DegreeToCareer.in</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const slug = urlParams.get('slug');
+
+    function renderDetail(uni) {
+      const courses = uni.courses || [];
+      document.title = `${uni.name} – DegreeToCareer`;
+      document.getElementById('detailContent').innerHTML = `
+        <h1 style="margin-bottom:10px">${uni.name}</h1>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px">
+          <span class="badge badge--verified">Verified</span>
+          ${uni.accreditation ? `<span class="badge badge--accent">${uni.accreditation}</span>` : ''}
+        </div>
+        <div class="admin-card" style="border-radius:20px;">
+          <h2 style="font-size:1.15rem;margin-bottom:14px;">Key Information</h2>
+          <p style="margin-bottom:8px"><strong>Accreditation:</strong> ${uni.accreditation || '—'}</p>
+          <p style="margin-bottom:8px"><strong>Ranking:</strong> ${uni.ranking ? `Top ${uni.ranking} in India` : '—'}</p>
+          <p style="margin-bottom:8px"><strong>Average Fees:</strong> ${uni.avg_fee || uni.fees || '—'}</p>
+          <p><strong>Placement Rate:</strong> ${uni.placement_rate || uni.placement || '—'}</p>
+        </div>
+        <div class="admin-card" style="border-radius:20px;">
+          <h2 style="font-size:1.15rem;margin-bottom:14px;">About the University</h2>
+          <p>${uni.description || 'Details for this university will be added soon.'}</p>
+        </div>
+        ${courses.length ? `
+        <div class="admin-card" style="border-radius:20px;">
+          <h2 style="font-size:1.15rem;margin-bottom:14px;">Popular Courses</h2>
+          <ul class="course-list" style="display:flex;flex-wrap:wrap;gap:8px;">
+            ${courses.map(c => `<li style="background:var(--indigo-tint);color:var(--indigo);padding:6px 14px;border-radius:999px;font-size:0.85rem;">${c}</li>`).join('')}
+          </ul>
+        </div>` : ''}
+        <a href="contact.html?uni=${uni.slug || ''}" class="btn btn--gold btn--lg" style="margin-top:8px">Enquire Now</a>
+      `;
+    }
+
+    (async function init() {
+      if (!slug) {
+        document.getElementById('detailContent').innerHTML = `<div class="empty-state"><div class="empty-icon">🎓</div><h3>No university specified</h3><p><a href="universities.html" style="color:var(--indigo);font-weight:600;">Browse universities →</a></p></div>`;
+        return;
+      }
+      const uni = await dtcFetchUniversityBySlug(slug);
+      if (uni) renderDetail(uni);
+      else document.getElementById('detailContent').innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><h3>University not found</h3><p><a href="universities.html" style="color:var(--indigo);font-weight:600;">Back to listing →</a></p></div>`;
+    })();
+  </script>
+</body>
+</html>

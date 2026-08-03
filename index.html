@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DegreeToCareer – India's Trusted Education Platform</title>
+  <meta name="description" content="Find UGC-approved universities, compare courses, use ROI & EMI calculators, get free counselling. Trusted by 50,000+ students.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header__inner">
+      <a href="index.html" class="header__logo">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        DegreeToCareer
+      </a>
+      <nav class="header__nav">
+        <a href="index.html" class="active">Home</a>
+        <a href="universities.html">Universities</a>
+        <a href="courses.html">Courses</a>
+        <a href="compare.html">Compare</a>
+        <a href="course-quiz.html">Quiz</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a href="booking.html" class="btn btn--gold header__cta">Book Free Call</a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
+  </header>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <nav class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu__close" id="closeMenu" aria-label="Close menu">&times;</button>
+    <a href="index.html" class="active">Home</a>
+    <a href="universities.html">Universities</a>
+    <a href="courses.html">Courses</a>
+    <a href="compare.html">Compare</a>
+    <a href="course-quiz.html">Quiz</a>
+    <a href="contact.html">Contact</a>
+    <a href="booking.html" class="btn btn--gold">Book Free Call</a>
+  </nav>
+
+  <!-- ===== MAIN ===== -->
+  <main>
+    <!-- Hero -->
+    <section class="hero container">
+      <div class="hero__eyebrow"><span class="eyebrow">UGC-DEB approved · 5,000+ programs</span></div>
+      <h1>Your dream degree,<br><em>mapped to a real career</em></h1>
+      <p class="hero__lede">Compare UGC-approved online &amp; distance universities side by side, run the numbers with our free tools, and talk to a counsellor who isn't paid to push one college over another.</p>
+      <div class="hero__search">
+        <input type="text" id="heroSearch" placeholder="Search universities or courses — e.g. Online MBA" aria-label="Search">
+        <button class="btn btn--primary" onclick="handleSearch()">Search</button>
+      </div>
+      <div class="trust-strip">
+        <span>✅ UGC-DEB Approved</span>
+        <span>🔒 SSL Secured</span>
+        <span>⭐ 4.8/5 from 2,300+ students</span>
+      </div>
+
+      <div class="path-rail" aria-hidden="false">
+        <div class="path-step"><strong>1. Discover</strong><span>Browse 5,000+ verified programs</span></div>
+        <div class="path-step"><strong>2. Compare</strong><span>Fees, ranking &amp; placement, side by side</span></div>
+        <div class="path-step"><strong>3. Decide</strong><span>Run ROI &amp; EMI numbers before you commit</span></div>
+        <div class="path-step"><strong>4. Enrol</strong><span>Free counselling, zero pressure</span></div>
+      </div>
+    </section>
+
+    <!-- Why Us -->
+    <section class="section container">
+      <div class="section-title">
+        <span class="eyebrow" style="justify-content:center;display:flex;margin-bottom:12px;">Why DegreeToCareer</span>
+        <h2>Built for a decision this big</h2>
+        <p>Choosing a university shouldn't feel like a gamble. We make it simple, transparent and free.</p>
+      </div>
+      <div class="why-grid">
+        <div class="why-item"><div class="why-item__icon">🔍</div><h3>Smart Search</h3><p style="color:var(--text-sec);font-size:0.9rem;">Filter by state, accreditation and fees in seconds.</p></div>
+        <div class="why-item"><div class="why-item__icon">⚖️</div><h3>Side-by-side Compare</h3><p style="color:var(--text-sec);font-size:0.9rem;">Put up to 4 universities head to head.</p></div>
+        <div class="why-item"><div class="why-item__icon">📈</div><h3>ROI &amp; EMI Calculators</h3><p style="color:var(--text-sec);font-size:0.9rem;">See the real payback before you enrol.</p></div>
+        <div class="why-item"><div class="why-item__icon">🎓</div><h3>Free, Unbiased Counselling</h3><p style="color:var(--text-sec);font-size:0.9rem;">Advice from people with no seat quota to fill.</p></div>
+      </div>
+    </section>
+
+    <!-- Top Universities -->
+    <section class="section section--surface">
+      <div class="container">
+        <div class="section-title"><h2>Top Trusted Universities</h2><p>Handpicked institutions with strong placement records.</p></div>
+        <div class="uni-grid" id="uniGrid">
+          <div class="skeleton" style="height:190px"></div><div class="skeleton" style="height:190px"></div>
+          <div class="skeleton" style="height:190px"></div><div class="skeleton" style="height:190px"></div>
+        </div>
+        <div style="text-align:center;margin-top:32px;"><a href="universities.html" class="btn btn--secondary">Browse all universities →</a></div>
+      </div>
+    </section>
+
+    <!-- Popular Courses -->
+    <section class="section container">
+      <div class="section-title"><h2>Most Popular Courses</h2><p>Explore programs that lead to high-growth careers.</p></div>
+      <div class="course-grid" id="courseGrid">
+        <div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:140px"></div>
+        <div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:140px"></div>
+      </div>
+    </section>
+
+    <!-- Tools Section -->
+    <section class="section section--surface">
+      <div class="container">
+        <div class="section-title"><h2>Free Decision Tools</h2><p>Run the numbers before you sign up for anything.</p></div>
+        <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;">
+          <a href="roi-calculator.html" class="btn btn--secondary" style="padding:16px 26px;">📈 ROI Calculator</a>
+          <a href="emi-calculator.html" class="btn btn--secondary" style="padding:16px 26px;">💰 EMI Calculator</a>
+          <a href="fee-comparison.html" class="btn btn--secondary" style="padding:16px 26px;">📊 Fee Comparison</a>
+          <a href="course-quiz.html" class="btn btn--secondary" style="padding:16px 26px;">🎯 Course Quiz</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="section container">
+      <div class="section-title"><h2>What Students Say</h2></div>
+      <div class="testimonial-grid">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="quote">"DegreeToCareer helped me shortlist genuine UGC-approved colleges. The counselling was honest and pressure-free."</p>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:16px;"><div class="avatar">A</div><div><strong>Ankit S.</strong><br><small style="color:var(--text-light)">MBA Student</small></div></div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="quote">"The comparison feature and ROI calculator saved me weeks of research."</p>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:16px;"><div class="avatar">P</div><div><strong>Priya P.</strong><br><small style="color:var(--text-light)">B.Tech Aspirant</small></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section container">
+      <div class="section-title"><h2>Frequently Asked Questions</h2></div>
+      <div class="faq-list">
+        <div class="faq-item"><button class="faq-q">Are online degrees valid in India? <span>▾</span></button><div class="faq-a">Yes — degrees from UGC-DEB approved universities are fully valid for government jobs, higher education and private employment.</div></div>
+        <div class="faq-item"><button class="faq-q">How does your free counselling work? <span>▾</span></button><div class="faq-a">Fill the enquiry form or book a slot, and our expert will call you within 24 hours to talk through the best options for you.</div></div>
+        <div class="faq-item"><button class="faq-q">Is my data safe? <span>▾</span></button><div class="faq-a">Yes. Your information is encrypted and is never shared without your consent.</div></div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <div class="cta container">
+      <h2>Ready to find your perfect university?</h2>
+      <p>Join 50,000+ students who trusted us to make the right decision.</p>
+      <a href="booking.html" class="btn btn--gold btn--lg">Book Free Counselling</a>
+    </div>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="footer__grid">
+      <div class="footer__col">
+        <div class="footer__brand">DegreeToCareer</div>
+        <p style="font-size:0.85rem;color:#A6AAC7;max-width:220px;">India's trusted platform for finding UGC-approved online &amp; distance universities.</p>
+      </div>
+      <div class="footer__col"><h4>Explore</h4><a href="universities.html">Universities</a><a href="courses.html">Courses</a><a href="compare.html">Compare</a></div>
+      <div class="footer__col"><h4>Tools</h4><a href="roi-calculator.html">ROI Calculator</a><a href="emi-calculator.html">EMI Calculator</a><a href="fee-comparison.html">Fee Comparison</a><a href="course-quiz.html">Course Quiz</a></div>
+      <div class="footer__col"><h4>Support</h4><a href="contact.html">Contact</a><a href="booking.html">Book Counselling</a></div>
+    </div>
+    <div class="footer__bottom">&copy; 2026 DegreeToCareer.in · All rights reserved.</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    // FAQ accordion
+    document.querySelectorAll('.faq-q').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        const wasOpen = item.classList.contains('open');
+        item.parentElement.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+        if (!wasOpen) item.classList.add('open');
+      });
+    });
+
+    // Load real data (Supabase) with graceful fallback
+    (async function loadHome() {
+      const { data: unis } = await dtcFetchUniversities();
+      document.getElementById('uniGrid').innerHTML = unis.slice(0, 4).map(u => `
+        <div class="uni-card">
+          <div class="uni-card__header">
+            <div class="uni-card__logo">${u.logo_url ? `<img src="${u.logo_url}" alt="">` : (u.name || '?').charAt(0)}</div>
+            <div><div class="uni-card__name">${u.name}</div><div class="uni-card__meta">${u.accreditation || ''}</div></div>
+          </div>
+          <div class="uni-card__footer">
+            <span class="badge badge--verified">Verified</span>
+            <a href="uni-detail.html?slug=${u.slug}" class="btn btn--ghost">Details →</a>
+          </div>
+        </div>
+      `).join('');
+
+      const { data: courses } = await dtcFetchCourses();
+      document.getElementById('courseGrid').innerHTML = courses.slice(0, 5).map(c => `
+        <div class="course-card">
+          <div class="course-card__icon">${DTC_ICONS[c.level] || '📘'}</div>
+          <h3>${c.name}</h3>
+          <p>${c.duration || ''}</p>
+        </div>
+      `).join('');
+    })();
+
+    function handleSearch() {
+      const q = document.getElementById('heroSearch').value.trim();
+      if (q) window.location.href = `universities.html?search=${encodeURIComponent(q)}`;
+      else dtcToast('Enter a university or course name to search.', 'error');
+    }
+    document.getElementById('heroSearch').addEventListener('keydown', e => { if (e.key === 'Enter') handleSearch(); });
+  </script>
+</body>
+</html>

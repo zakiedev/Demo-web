@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Quiz – DegreeToCareer</title>
+  <meta name="description" content="Answer a few quick questions and get a personalised course recommendation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .question-block { margin-bottom: 26px; }
+    .question-block h3 { font-size: 1.02rem; margin-bottom: 12px; font-family: var(--font-body); font-weight: 600; }
+    .options { display: flex; flex-wrap: wrap; gap: 10px; }
+    .option { padding: 11px 18px; border: 1.5px solid var(--line); border-radius: var(--r-full); font-size: 0.88rem; cursor: pointer; transition: all 0.15s; background: var(--surface); }
+    .option:hover { border-color: var(--indigo); }
+    .option.selected { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header__inner">
+      <a href="index.html" class="header__logo">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        DegreeToCareer
+      </a>
+      <nav class="header__nav">
+        <a href="index.html">Home</a>
+        <a href="universities.html">Universities</a>
+        <a href="courses.html">Courses</a>
+        <a href="compare.html">Compare</a>
+        <a href="course-quiz.html" class="active">Quiz</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a href="booking.html" class="btn btn--gold header__cta">Book Free Call</a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
+  </header>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <nav class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu__close" id="closeMenu" aria-label="Close menu">&times;</button>
+    <a href="index.html">Home</a>
+    <a href="universities.html">Universities</a>
+    <a href="courses.html">Courses</a>
+    <a href="compare.html">Compare</a>
+    <a href="course-quiz.html" class="active">Quiz</a>
+    <a href="contact.html">Contact</a>
+    <a href="booking.html" class="btn btn--gold">Book Free Call</a>
+  </nav>
+
+  <main class="section container">
+    <div class="card-panel" style="max-width:640px;margin:0 auto;">
+      <span class="eyebrow">2-minute quiz</span>
+      <h1 style="font-size:1.7rem;margin:8px 0 6px;">Find Your Course</h1>
+      <p style="color:var(--text-sec);margin-bottom:28px">Answer 4 quick questions for a personalised recommendation.</p>
+
+      <div class="question-block">
+        <h3>1. What's your current education level?</h3>
+        <div class="options" data-group="education">
+          <div class="option" data-value="12th">Completed 12th</div>
+          <div class="option" data-value="graduate">Graduate</div>
+          <div class="option" data-value="postgraduate">Postgraduate</div>
+        </div>
+      </div>
+      <div class="question-block">
+        <h3>2. Which field interests you most?</h3>
+        <div class="options" data-group="field">
+          <div class="option" data-value="management">Management</div>
+          <div class="option" data-value="technology">Technology</div>
+          <div class="option" data-value="healthcare">Healthcare</div>
+          <div class="option" data-value="commerce">Commerce</div>
+        </div>
+      </div>
+      <div class="question-block">
+        <h3>3. What is your primary career goal?</h3>
+        <div class="options" data-group="goal">
+          <div class="option" data-value="job">Get a job</div>
+          <div class="option" data-value="promotion">Promotion / hike</div>
+          <div class="option" data-value="switch">Switch career</div>
+          <div class="option" data-value="startup">Start a business</div>
+        </div>
+      </div>
+      <div class="question-block">
+        <h3>4. Preferred mode of learning?</h3>
+        <div class="options" data-group="mode">
+          <div class="option" data-value="online">100% Online</div>
+          <div class="option" data-value="hybrid">Hybrid (Online + Weekend)</div>
+          <div class="option" data-value="part-time">Part-time classroom</div>
+        </div>
+      </div>
+
+      <button class="btn btn--gold btn--lg btn--block" onclick="getRecommendation()">See My Recommendation</button>
+      <div id="recommendationResult"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__grid">
+      <div class="footer__col"><div class="footer__brand">DegreeToCareer</div><p style="font-size:0.85rem;color:#A6AAC7;max-width:220px;">India's trusted platform for finding UGC-approved online &amp; distance universities.</p></div>
+      <div class="footer__col"><h4>Explore</h4><a href="universities.html">Universities</a><a href="courses.html">Courses</a><a href="compare.html">Compare</a></div>
+      <div class="footer__col"><h4>Tools</h4><a href="roi-calculator.html">ROI Calculator</a><a href="emi-calculator.html">EMI Calculator</a><a href="fee-comparison.html">Fee Comparison</a></div>
+      <div class="footer__col"><h4>Support</h4><a href="contact.html">Contact</a><a href="booking.html">Book Counselling</a></div>
+    </div>
+    <div class="footer__bottom">&copy; 2026 DegreeToCareer.in</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    document.querySelectorAll('.option').forEach(opt => {
+      opt.addEventListener('click', function () {
+        const group = this.closest('.options');
+        group.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+
+    function getRecommendation() {
+      const education = document.querySelector('.options[data-group="education"] .option.selected')?.dataset.value;
+      const field = document.querySelector('.options[data-group="field"] .option.selected')?.dataset.value;
+      const goal = document.querySelector('.options[data-group="goal"] .option.selected')?.dataset.value;
+
+      if (!education || !field || !goal) { dtcToast('Please answer all questions.', 'error'); return; }
+
+      let course = '';
+      if (field === 'management') course = 'Online MBA';
+      else if (field === 'technology') course = education === 'graduate' || education === 'postgraduate' ? 'M.Sc Data Science' : 'B.Tech Computer Science';
+      else if (field === 'healthcare') course = 'B.Sc Nursing';
+      else course = 'B.Com (Hons)';
+
+      document.getElementById('recommendationResult').innerHTML = `
+        <div class="result-box">
+          <h2 style="font-family:var(--font-display);font-size:1.3rem;">🎉 We recommend: ${course}</h2>
+          <p style="margin-top:10px">Based on your interest in <strong>${field}</strong> and your goal to <strong>${goal.replace('-', ' ')}</strong>, this course matches your profile.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+            <a href="courses.html" class="btn btn--primary">Explore Courses</a>
+            <a href="contact.html" class="btn btn--ghost">Get Free Counselling</a>
+          </div>
+        </div>
+      `;
+      document.getElementById('recommendationResult').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  </script>
+</body>
+</html>

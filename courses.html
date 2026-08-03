@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courses – DegreeToCareer</title>
+  <meta name="description" content="Explore 25,000+ online and distance courses from UGC-approved universities.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header__inner">
+      <a href="index.html" class="header__logo">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        DegreeToCareer
+      </a>
+      <nav class="header__nav">
+        <a href="index.html">Home</a>
+        <a href="universities.html">Universities</a>
+        <a href="courses.html" class="active">Courses</a>
+        <a href="compare.html">Compare</a>
+        <a href="course-quiz.html">Quiz</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a href="booking.html" class="btn btn--gold header__cta">Book Free Call</a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
+  </header>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <nav class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu__close" id="closeMenu" aria-label="Close menu">&times;</button>
+    <a href="index.html">Home</a>
+    <a href="universities.html">Universities</a>
+    <a href="courses.html" class="active">Courses</a>
+    <a href="compare.html">Compare</a>
+    <a href="course-quiz.html">Quiz</a>
+    <a href="contact.html">Contact</a>
+    <a href="booking.html" class="btn btn--gold">Book Free Call</a>
+  </nav>
+
+  <main class="container section">
+    <div class="section-title" style="text-align:left;margin-bottom:28px;">
+      <span class="eyebrow">25,000+ courses</span>
+      <h1 style="font-size:clamp(1.7rem,4vw,2.4rem);margin-top:8px;">Explore Courses</h1>
+    </div>
+    <div class="filters">
+      <input type="text" id="courseSearch" placeholder="Search by course name..." oninput="renderCourses()" aria-label="Search courses" style="min-width:260px;">
+    </div>
+    <div class="course-grid" id="courseGrid">
+      <div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:140px"></div>
+      <div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:140px"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__grid">
+      <div class="footer__col"><div class="footer__brand">DegreeToCareer</div><p style="font-size:0.85rem;color:#A6AAC7;max-width:220px;">India's trusted platform for finding UGC-approved online &amp; distance universities.</p></div>
+      <div class="footer__col"><h4>Explore</h4><a href="universities.html">Universities</a><a href="courses.html">Courses</a><a href="compare.html">Compare</a></div>
+      <div class="footer__col"><h4>Tools</h4><a href="roi-calculator.html">ROI Calculator</a><a href="emi-calculator.html">EMI Calculator</a><a href="fee-comparison.html">Fee Comparison</a><a href="course-quiz.html">Course Quiz</a></div>
+      <div class="footer__col"><h4>Support</h4><a href="contact.html">Contact</a><a href="booking.html">Book Counselling</a></div>
+    </div>
+    <div class="footer__bottom">&copy; 2026 DegreeToCareer.in</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    let allCourses = [];
+
+    function renderCourses() {
+      const search = document.getElementById('courseSearch').value.toLowerCase().trim();
+      const filtered = allCourses.filter(c => c.name.toLowerCase().includes(search));
+      const grid = document.getElementById('courseGrid');
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon">📚</div><h3>No courses found</h3><p>Try a different search term.</p></div>`;
+        return;
+      }
+      grid.innerHTML = filtered.map(c => `
+        <div class="course-card">
+          <div class="course-card__icon">${DTC_ICONS[c.level] || '📘'}</div>
+          <h3>${c.name}</h3>
+          <p>${c.duration || ''}${c.level ? ' · ' + c.level : ''}</p>
+        </div>
+      `).join('');
+    }
+
+    (async function init() {
+      const { data } = await dtcFetchCourses();
+      allCourses = data;
+      renderCourses();
+    })();
+  </script>
+</body>
+</html>
